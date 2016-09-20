@@ -2,6 +2,17 @@ var scene;   //scene object
 var camera;
 var cubeMesh;
 
+
+//animation variables
+var targetRotation = 0;
+var targetRotationOnMouseDown = 0;
+
+var mouseX = 0;
+var mouseXOnMouseDown = 0;
+
+var windowHalfX = window.innerWidth / 2;
+var windowHalfY = window.innerHeight / 2;
+
 init();
 animate();
 
@@ -15,13 +26,16 @@ function init(){
     }
 
      // Set the background color of the renderer to black, with full opacity
-     renderer.setClearColor(0x000000,1);
+    // renderer.setClearColor(0x000000,1);
+
+    //I make transparent background of canvas
+    renderer = new THREE.WebGLRenderer( { alpha: true } );
       // Get the size of the inner window (content area) to create a full size renderer
     canvasWidth = window.innerWidth;
     canvasHeight = window.innerHeight;
 
-       // Set the renderers size to the content areas size
-    renderer.setSize(canvasWidth, canvasHeight);
+       // Set the renderers size
+    renderer.setSize( 800, 250 );
 
     // Get the DIV element from the HTML document by its ID and append the renderers DOM
     //object to it
@@ -57,7 +71,7 @@ function init(){
     // Create the cube
     //parameters width, height, depth
 
-    var boxGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+    var boxGeometry = new THREE.BoxGeometry(2, 2, 2);
 
     // Applying different materials to the faces is a more difficult than applying one
      // material to the whole geometry. We start with creating an array of
@@ -65,26 +79,59 @@ function init(){
 
      // Define six colored materials
 
-     var boxMaterials = [
-        new THREE.MeshBasicMaterial({color:0xFF0000}),
-        new THREE.MeshBasicMaterial({color:0x00FF00}),
-        new THREE.MeshBasicMaterial({color:0x0000FF}),
-        new THREE.MeshBasicMaterial({color:0xFF0000}),
-        new THREE.MeshBasicMaterial({color:0xFFFF00}),
-        new THREE.MeshBasicMaterial({color:0xFFFFFF}),
-     ];
+     // var boxMaterials = [
+     //    new THREE.MeshBasicMaterial({color:0XFFFFFF}),
+     //    new THREE.MeshBasicMaterial({color:0XFFFFFF}),
+     //    new THREE.MeshBasicMaterial({color:0XFFFFFF}),
+     //    new THREE.MeshBasicMaterial({color:0XFFFFFF}),
+     //    new THREE.MeshBasicMaterial({color:0XFFFFFF}),
+     //    new THREE.MeshBasicMaterial({color:0xFFFFFF}),
+     // ];
 
      // Create a MeshFaceMaterial, which allows the cube to have different materials on
      // each face
 
-     var boxMaterial = new THREE.MeshFaceMaterial(boxMaterials);
+     // var boxMaterial = new THREE.MeshFaceMaterial(boxMaterials); //if I want every layer to be different color
+
+     var boxMaterial = new THREE.MeshBasicMaterial({color:0XFFFFFF});
 
      // Create a mesh and insert the geometry and the material. Translate the whole mesh
      // by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
      boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-     boxMesh.position.set(1.5, 0.0, 4.0);
+     boxMesh.position.set(0, 0, 0);
      scene.add(boxMesh);
+
+     // move mouse and: left   click to rotate,
+    //                 middle click to zoom,
+    //                 right  click to pan
+    controls = new THREE.OrbitControls( camera, renderer.domElement );
+    controls.minDistance = 9;
+    controls.maxDistance = 12;
+    controls.rotateSpeed = 0.3;
+
+
+    //GUI WITH COLOR CHANGE
+
+    gui = new dat.GUI();
+
+    parameters = {
+        x: 0, y: 30, z: 0,
+        color:  "#ff0000", // color (change "#" to "0x")
+    };
+
+    var boxMeshColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
+    boxMeshColor.onChange(function(value){ // onFinishChange
+        boxMesh.material.color.setHex( value.replace("#", "0x") );
+    });
+
+    gui.open();
+    updateBoxMesh();
 }
+
+function updateBoxMesh(){
+    var newMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+}
+
 
 function animate(){
     // Define the function, which is called by the browser supported timer loop. If the
