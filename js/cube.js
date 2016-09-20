@@ -73,6 +73,8 @@ function init(){
 
     var boxGeometry = new THREE.BoxGeometry(2, 2, 2);
 
+    var box2Geometry = new THREE.BoxGeometry(3, 3, 3);
+
     // Applying different materials to the faces is a more difficult than applying one
      // material to the whole geometry. We start with creating an array of
      // THREE.MeshBasicMaterial.
@@ -93,13 +95,26 @@ function init(){
 
      // var boxMaterial = new THREE.MeshFaceMaterial(boxMaterials); //if I want every layer to be different color
 
-     var boxMaterial = new THREE.MeshBasicMaterial({color:0XFFFFFF});
+     var boxMaterial = new THREE.MeshBasicMaterial({color:0XFFFFFF});  ///basic material white by default
 
      // Create a mesh and insert the geometry and the material. Translate the whole mesh
      // by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
      boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
      boxMesh.position.set(0, 0, 0);
      scene.add(boxMesh);
+
+
+     // var textureLoader = new THREE.TextureLoader(); //get material from file for cube2
+     //        textureLoader.load("/textures/laminat.jpg", function(map){
+     //            loadedTexture = map;
+     //            standardMaterial.roughnessMap = map;
+     //        });
+
+     var textureLaminat = THREE.ImageUtils.loadTexture("/textures/laminat.jpg");
+     var cube2material = new THREE.MeshBasicMaterial({map: textureLaminat})
+     var box2Mesh = new THREE.Mesh(box2Geometry, cube2material);
+     box2Mesh.position.set(3, 0, 0);
+     scene.add(box2Mesh);
 
      // move mouse and: left   click to rotate,
     //                 middle click to zoom,
@@ -116,7 +131,7 @@ function init(){
 
     parameters = {
         x: 0, y: 30, z: 0,
-        color:  "#ff0000", // color (change "#" to "0x")
+        color:  "#ffffff", // color (change "#" to "0x")
     };
 
     var boxMeshColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
@@ -140,6 +155,11 @@ function animate(){
     requestAnimationFrame(animate);
     // Map the 3D scene down to the 2D screen (render the frame)
     render();
+    update();
+}
+
+function update(){
+    controls.update();
 }
 
 function render(){
